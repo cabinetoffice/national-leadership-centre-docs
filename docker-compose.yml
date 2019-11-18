@@ -7,3 +7,10 @@ services:
       - "35729:35729"
     volumes:
       - ./source:/usr/src/app/source
+    command: ["bundle", "exec", "middleman", "server", "--bind-address", "0.0.0.0"]
+  build:
+    build: .
+    volumes:
+       - ./source:/usr/src/app/source
+       - ./build:/usr/src/app/build
+    command: ["bundle", "exec", "middleman", "build"]

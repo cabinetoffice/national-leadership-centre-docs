@@ -1,21 +1,14 @@
-FROM ruby:2.5.0
+FROM ruby:2.5-alpine
 
-RUN apt-get update -qq \
-  && apt-get install -y --no-install-recommends \
-    nodejs \
-  && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /usr/src/app
-
-COPY Gemfile /usr/src/app/Gemfile
-COPY Gemfile.lock /usr/src/app/Gemfile.lock
-COPY .ruby-version /usr/src/app/.ruby-version
-
-RUN bundle install
-COPY config.rb /usr/src/app/config.rb
-COPY config /usr/src/app/config
-COPY source /usr/src/app/source
-
-EXPOSE 4567
-EXPOSE 35729
-CMD ["bundle", "exec", "middleman", "server", "--bind-address", "0.0.0.0"]
+ENV RUNTIME_PACKAGES "python git nodejs make"
+ENV DEV_PACKAGES "py-pip python-dev musl-dev gcc ruby-dev g++ zlib-dev libffi-dev"
+COPY requirements.txt /tmp/requirements.txt
+COPY Gemfile /tmp/Gemfile
+COPY Gemfile.lock /tmp/Gemfile.lock
+RUN apk add --update $RUNTIME_PACKAGES
+RUN apk add $DEV_PACKAGES \
+  && pip install -r /tmp/requirements.txt \
+  && gem install bundle --no-document \
+  && cd /tmp && bundle \
+  && apk del $DEV_PACKAGES \
+  && rm -rf /var/cache/apk/*
