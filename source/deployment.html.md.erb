@@ -64,7 +64,7 @@ Deploys kubernetes in the created VPC, creates an auto scaling group and configu
 
 Scaling group configuration (machine sizes and the like) are to be determined per environment via terragrunt.
 
-typical output.
+typical output - a generated kubeconfig file for the EKS cluster
 
 ```
 
@@ -74,16 +74,6 @@ cluster_endpoint = https://38082B119860487C016637712A17D59C.yl4.eu-west-2.eks.am
 cluster_security_group_id = sg-02c61aa67bbbb4ef5
 config_map_aws_auth = apiVersion: v1
 kind: ConfigMap
-metadata:
-  name: aws-auth
-  namespace: kube-system
-data:
-  mapRoles: |
-    - rolearn: arn:aws:iam::844569024453:role/eks-for-testing-gsp20191120092645573700000005
-      username: system:node:{{EC2PrivateDNSName}}
-      groups:
-        - system:bootstrappers
-        - system:nodes
 
 [ etc ]
 
@@ -94,8 +84,6 @@ kind: Config
 clusters:
 - cluster:
     server: https://38082B119860487C016637712A17D59C.yl4.eu-west-2.eks.amazonaws.com
-    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRFNU1URXlNREE1TWpRMU0xb1hEVEk1TVRFeE56QTVNalExTTFvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTFdFCnFKUWlQVkp3TzAwWTRUbWFVWjZ5SjRUVXNMN2N0K20yZkZUYWk1VzR1bEUwcEtlTytBUy9MVHh4bUhnYnhTUVkKczRCVjFTaGRNVXRmNmxpdHNRS3NBbHFQRlZSZUFPMmNyeHVkMUNCN0RyMnJ3Skt6eCs4UlRIaURUSWFDNG1UaApqeU9paUttZ1grWVU2THA4ZUEzVUNkalpBZzFDdXBaZlk0S3ZjYktCdGZFU1dvOXdwVXV0WjZ4S2lRRUJUN3NnCmJ1WWxqNGpGWC9QRVppYm9ad2ZFR2VkWmI5WmRzUVg4SXV3YW5OeG5SMlE5emRUb3BqZjVsRDdVMXFjNGJXdG0Kanl3eDlhTmFTUURBb2JBVDlrZFd0SXZHaS9YREtVVmI1WkpRUGFLYnRIR3VNOTFPajNKSTFlSWZOTmdtcnNKUAp4bmdObDh6dS9sVTVYSGovSGJNQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFHS2FRSDdsbmtZeWE1d1ZnU09MMkVmeStVL3cKMjNINXVkaS9idE8rN1pIS2ptQW5kZ09yTFE3eVpnMGNaN0gxSllZVnhwckZKbnJiZlVVS05JdEN3c1BkTnhqNwpENzkzS2xMMTlWa28xeFN0NjAwTkJST2lyRHVkcENrSk5ENEtQOFFiOVJEV05WTGhKajNwUmhvZzl2SExrQ2YrCmNQTTJTUDNDMmlXaFU5SXZMd014ajI5T0FOOEdqM2xoczhjQlltV21ua0dHZ3lSajRwSkJUT0VWRk9pMWtLMWIKc2JyR2tWZkcvbkc4U1k4RG5rdklxb1ZnZEdYRGpHQllSRTF0cWJ6NmNMaEF4Y2o5dFlWNk1adXF4S3MvbFA0ZAp2VmZ4L25iVFo1V240MysrT3hVdEcxQXlERnpQTzhoa1EwL1F6TjNyUm1ZdW1MTVlJbEJTMG9nSHdsOD0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-  name: eks_eks-for-testing-gsp
 [ etc ]
 
 
