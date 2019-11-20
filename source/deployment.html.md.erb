@@ -130,14 +130,11 @@ The [GDS Supported Platform] (https://github.com/alphagov/gsp) contains various 
 
 ## Terraform Helm provider
 
-The terraform provider for helm (2) which can work with charts local to the terraform repository, or remote charts. It is likely that
-the best setup would be to have a chart repository, possibly via S3, and charts that are required for deployment are stored there.
-
-Mixing the charts into the terrraform repository makes it harder to use helm directly if required.
-
-https://github.com/dumrauf/s3-helm-chart-repo-with-docs looks like a useful place to start looking at this
+The [terraform provider for helm](https://www.terraform.io/docs/providers/helm/index.html) can work with charts local to the terraform repository, or remote charts. It is likely that
+the best setup would be to have a chart repository, possibly via S3, and charts that are required for deployment are stored there. Mixing the charts into the terrraform repository does not make much sense as it would be best to also be able to use those charts directly if required via a repository. Setting up a respoitory on S3 via terraform looks like a good option - some pointers on how to do this are [here](ttps://github.com/dumrauf/s3-helm-chart-repo-with-docs) 
 
 ## Atlantis
 
-[Atlantis] (https://www.runatlantis.io/) is a terraform deployment automation tool to plan and apply terraform manifests with a pull request workflow.
+[Atlantis] (https://www.runatlantis.io/) is a terraform deployment automation tool to plan and apply terraform manifests with a pull request workflow. It is intended that production deployments and infrastructure changes are managed in this way.
+
 
