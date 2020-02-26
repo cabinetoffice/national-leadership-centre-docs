@@ -1,16 +1,10 @@
 version: '3'
 services:
   web:
-    build: .
+    image: hashicorp/middleman-hashicorp
     ports:
       - "4567:4567"
       - "35729:35729"
     volumes:
-      - ./source:/usr/src/app/source
+      - ./:/website
     command: ["bundle", "exec", "middleman", "server", "--bind-address", "0.0.0.0"]
-  build:
-    build: .
-    volumes:
-       - ./source:/usr/src/app/source
-       - ./build:/usr/src/app/build
-    command: ["bundle", "exec", "middleman", "build"]
