@@ -8,3 +8,8 @@ services:
     volumes:
       - ./:/website
     command: ["bundle", "exec", "middleman", "server", "--bind-address", "0.0.0.0"]
+  build:
+    image: hashicorp/middleman-hashicorp
+    volumes: 
+      - ./:/website
+    command: ["bundle", "exec", "middleman", "build"]
