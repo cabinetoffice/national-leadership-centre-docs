@@ -1,6 +1,6 @@
 version: '3'
 services:
-  web:
+  dev:
     image: hashicorp/middleman-hashicorp
     ports:
       - "4567:4567"
