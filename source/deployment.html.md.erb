@@ -1,0 +1,140 @@
+
+
+# Architecture
+
+NLC Connect is deployed with the following components:
+
+- Drupal: Front end, authentication,
+- Neo4j: graph database
+- Salesforce: data storage
+
+(to be completed )
+
+# Deployment overview
+
+NLC Connect deploys as a number of Docker containers for application and microservices and uses terraform and helm (via the terraform helm provider) to create an isolated and secure infrastructure in a VPC in AWS.
+
+For development a combination of local docker containers or minikube is planned, or a test EKS configuration with a suitably sized resource for development and staging purposes.
+
+To deploy varying staging, test and production instances, terragrunt is used to configure suitable configurations.
+
+
+# Code
+
+There are 2 sets of code currently that use terraform and terragrunt configurations to bring up a VPC, an EKS cluster and to handle setup of that cluster for deployment of applications
+
+[Terragrunt](https://github.com/gruntwork-io/terragrunt) is a wrapper around terraform that allows for varying configurations for development, staging and production with a common terraform codebase.
+
+[Terraform] (https://terraform.io) is used, with modules for [VPC] ( https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws) and [EKS] (https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/) to bring up the EKS cluster and VPC in AWS region eu-west-2.
+
+## VPC Module -
+
+Brings up a VPC with 3 private, 3 public and 3 db subnets
+
+A typical output.
+
+ ```
+[terragrunt] 2019/11/20 10:14:37 Running command: terraform output
+database_subnets = [
+  "subnet-006c8831d68c7009d",
+  "subnet-0450fa4e6d824a417",
+  "subnet-031fcb734d2f7b660",
+]
+nat_public_ips = []
+private_subnets = [
+  "subnet-08a35570148d5aee1",
+  "subnet-0ddf3f2655eab24e9",
+  "subnet-03ae5f8cc13ede7cb",
+]
+public_subnets = [
+  "subnet-0285ee900cf46f6fa",
+  "subnet-02d1e19f59dc9dc84",
+  "subnet-0ed2b56ce6fd4597c",
+]
+vpc_id = vpc-01c543fbf31e3e37b
+
+ ```
+
+ This VPC is then used to deploy the EKS cluster
+
+
+## EKS Module -
+
+Deploys kubernetes in the created VPC, creates an auto scaling group and configures kubectl, and creates helm / tiller setup and various namespaces.
+
+Scaling group configuration (machine sizes and the like) are to be determined per environment via terragrunt.
+
+typical output - a generated kubeconfig file for the EKS cluster
+
+```
+
+Outputs:
+
+cluster_endpoint = https://38082B119860487C016637712A17D59C.yl4.eu-west-2.eks.amazonaws.com
+cluster_security_group_id = sg-02c61aa67bbbb4ef5
+config_map_aws_auth = apiVersion: v1
+kind: ConfigMap
+
+[ etc ]
+
+kubectl_config = apiVersion: v1
+preferences: {}
+kind: Config
+
+clusters:
+- cluster:
+    server: https://38082B119860487C016637712A17D59C.yl4.eu-west-2.eks.amazonaws.com
+[ etc ]
+
+
+
+ ```
+
+## Itsio module
+
+Deploys Itsio service mesh into the EKS cluster
+
+Typical output
+
+```
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+
+```
+
+Expected results
+
+```
+
+% kubctl get po --namespace=itsio-system
+NAME                            READY   STATUS      RESTARTS   AGE
+istio-init-crd-10-1.4.0-4vvmg   0/1     Completed   0          42s
+istio-init-crd-11-1.4.0-d5dds   0/1     Completed   0          42s
+istio-init-crd-14-1.4.0-9fsj8   0/1     Completed   0          42s
+
+ % kubectl get svc -n istio-system
+NAME                     TYPE           CLUSTER-IP       EXTERNAL-IP                                                             PORT(S)                                                                                                                                      AGE
+istio-citadel            ClusterIP      172.20.73.150    <none>                                                                  8060/TCP,15014/TCP                                                                                                                           26s
+istio-galley             ClusterIP      172.20.32.115    <none>                                                                  443/TCP,15014/TCP,9901/TCP                                                                                                                   26s
+istio-ingressgateway     LoadBalancer   172.20.193.207   a3c383e910b7a11eaa44002e42dc5b8c-15500086.eu-west-2.elb.amazonaws.com   15020:32329/TCP,80:31380/TCP,443:31390/TCP,31400:31400/TCP,15029:32089/TCP,15030:30011/TCP,15031:31271/TCP,15032:32005/TCP,15443:32690/TCP   26s
+istio-pilot              ClusterIP      172.20.213.174   <none>                                                                  15010/TCP,15011/TCP,8080/TCP,15014/TCP                                                                                                       26s
+istio-policy             ClusterIP      172.20.236.10    <none>                                                                  9091/TCP,15004/TCP,15014/TCP                                                                                                                 26s
+istio-sidecar-injector   ClusterIP      172.20.230.216   <none>                                                                  443/TCP,15014/TCP                                                                                                                            26s
+istio-telemetry          ClusterIP      172.20.91.151    <none>                                                                  9091/TCP,15004/TCP,15014/TCP,42422/TCP                                                                                                       26s
+prometheus               ClusterIP      172.20.71.93     <none>                                                                  9090/TCP                                                                                                                                     26s
+
+```
+
+## GSP
+
+The [GDS Supported Platform] (https://github.com/alphagov/gsp) contains various kubernetes deployments that will be useful in Connect, and where possible Connect will use the helm charts from there.
+
+## Terraform Helm provider
+
+The [terraform provider for helm](https://www.terraform.io/docs/providers/helm/index.html) can work with charts local to the terraform repository, or remote charts. It is likely that
+the best setup would be to have a chart repository, possibly via S3, and charts that are required for deployment are stored there. Mixing the charts into the terrraform repository does not make much sense as it would be best to also be able to use those charts directly if required via a repository. Setting up a respoitory on S3 via terraform looks like a good option - some pointers on how to do this are [here](ttps://github.com/dumrauf/s3-helm-chart-repo-with-docs) 
+
+## Atlantis
+
+[Atlantis] (https://www.runatlantis.io/) is a terraform deployment automation tool to plan and apply terraform manifests with a pull request workflow. It is intended that production deployments and infrastructure changes are managed in this way.
+
+
