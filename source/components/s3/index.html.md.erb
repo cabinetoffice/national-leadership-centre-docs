@@ -4,3 +4,13 @@ weight: 06
 ---
 
 # S3
+
+There are currently 3 buckets used for the Connect project (excluding Terraform).
+
+* nlc-static-prod
+* nlc-static-staging
+* nlc-concourse-semver
+
+The ``static`` s3 buckets are used to host static file assets like compiled and minified CSS and JS.
+
+S3 bucket configuration is handled by Terragrunt.

@@ -4,3 +4,9 @@ weight: 01
 ---
 
 # EKS
+
+EKS is the middle layer of the Connect infrastructure. It's used to manage and control the Docker containers that house the Connect codebase.
+
+All access is done through ``kubectl`` from the command line. We utilise [Helm](/components/helm) as well to ensure reliable and repeatable deployments.
+
+EKS access is strictly controlled and requires the correct AWS IAM role permissions.

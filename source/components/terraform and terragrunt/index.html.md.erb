@@ -8,3 +8,23 @@ weight: 07
 Terraform - [https://github.com/cabinetoffice/national-leadership-centre-terraform](https://github.com/cabinetoffice/national-leadership-centre-terraform)
 
 Terragrunt - [https://github.com/cabinetoffice/national-leadership-centre-terragrunt](https://github.com/cabinetoffice/national-leadership-centre-terragrunt)
+
+Both these repositories form the backbone of the infrastructure.
+
+## Terraform
+
+This contains the terraform modules that are used within the Terragrunt repository. Usually these won't be modified. They are pulled in remotely by the Terragrunt repo.
+
+More information on Terraform can be found [here](https://www.terraform.io/). We currently use version 0.12.
+
+## Terragrunt
+
+This contains all the variables that get applied to the infrastructure. Terragrunt downloads the modules from the Terraform repository.
+
+More information on Terragrunt can be found [here](https://github.com/gruntwork-io/terragrunt).
+
+You will need to makes sure you have valid NLC AWS credentials in order to run any infrastructure changes through Terragrunt.
+
+## State
+
+Terraform state is stored in an S3 bucket which DynamoDB locking.
