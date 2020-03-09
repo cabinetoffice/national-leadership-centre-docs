@@ -8,3 +8,12 @@ weight: 03
 [Concourse](https://concourse-ci.org/) is our CI/CD tool. It can be accessed by proxying into the Kubernetes cluster.
 
 An overview of the pipelines currently used can be found [here](https://github.com/cabinetoffice/national-leadership-centre-deployment/tree/master/pipelines).
+
+To quickly connect to concourse use the following:
+
+```
+export POD_NAME=$(kubectl get pods --namespace concourse -l "app=concourse-web" -o jsonpath="{.items[0].metadata.name}")
+kubectl port-forward --namespace concourse $POD_NAME 8080:8080
+```
+
+Concourse should be available at [http://127.0.0.1:8080](http://127.0.0.1:8080).
