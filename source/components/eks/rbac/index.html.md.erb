@@ -1,0 +1,16 @@
+---
+title: RABC
+weight: 01
+---
+
+# RBAC
+
+RBAC config within EKS and Service Accounts
+
+  - There are two configured service accounts which apps to use for authenticating to vault for secrets - `connect-staging-sa` and `connect-sa` - These are configured in the nlc-connect helm chart and referenced in the vault configs.
+
+  - in `networking/alb-ingress-controller-rbac-role.yaml` the k8s permissions where the alb-ingress-controller users are defined.
+
+  - in `ops-service-account/00-service-account.yaml` an operations service account is created so a kubeconfig file can be generated to allow access to the cluster when needed without an AWS account 
+
+  - A service account to allow concourse to deploy applications automatically on build will be defined.
