@@ -2,7 +2,7 @@
 
 ## Getting started
 
-The simplest way of gettings started is to run
+The simplest way of getting started is to run:
 
 ```
 docker-compose up dev
