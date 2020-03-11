@@ -2,16 +2,13 @@
 
 ## Getting started
 
-To preview or build the website, we need to use the terminal.
-
-Install Ruby with Rubygems, perferably with a [Ruby version manager][rvm],
-and the [Bundler gem][bundler].
-
-In the application folder type the following to install the required gems:
+The simplest way of gettings started is to run
 
 ```
-bundle install
+docker-compose up dev
 ```
+
+This will bring up a development server you can visit in your browser.
 
 ## Making changes
 
@@ -45,7 +42,7 @@ access it if they are given the link.
 Type the following to start the server:
 
 ```
-bundle exec middleman server
+docker-compose up dev
 ```
 
 If all goes well something like the following output will be displayed:
@@ -87,7 +84,7 @@ the HTML and asset files ready to be published.
 
 ## Code of conduct
 
-Please refer to the `alphagov` [code of conduct](https://github.com/alphagov/code-of-conduct). 
+Please refer to the `alphagov` [code of conduct](https://github.com/alphagov/code-of-conduct).
 
 ## Licence
 
