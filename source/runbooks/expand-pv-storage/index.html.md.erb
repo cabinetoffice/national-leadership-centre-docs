@@ -1,0 +1,172 @@
+---
+title: Expand Persistent Volume Storage
+weight: 01
+---
+
+# Expand Persistent Volume Storage
+
+When a persistent volume claim has been created on EKS and it turns out to need more storage.
+
+```
+$ kubectl exec -t -i -n concourse concourse-worker-0  df /concourse-work-dir
+Filesystem     1K-blocks     Used Available Use% Mounted on
+/dev/nvme1n1    20511312 18434580   2060348  90% /concourse-work-dir
+
+$ kubectl exec -t -i -n concourse concourse-worker-1  df /concourse-work-dir
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/nvme2n1    20511312 2983724  17511204  15% /concourse-work-dir
+
+$ kubectl get -n concourse pvc concourse-work-dir-concourse-worker-0
+NAME                                    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+concourse-work-dir-concourse-worker-0   Bound    pvc-72ca24b8-3e25-11ea-914c-0639379dec16   20Gi       RWO            gp2            31d
+
+$ kubectl get -n concourse pvc concourse-work-dir-concourse-worker-1
+NAME                                    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+concourse-work-dir-concourse-worker-1   Bound    pvc-72cc8e85-3e25-11ea-914c-0639379dec16   20Gi       RWO            gp2            31d
+```
+
+Ensure that the gp2 storage class is expandable.
+
+```
+$ kubectl get sc gp2 -o yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"},"name":"gp2"},"parameters":{"fsType":"ext4","type":"gp2"},"provisioner":"kubernetes.io/aws-ebs","volumeBindingMode":"WaitForFirstConsumer"}
+    storageclass.kubernetes.io/is-default-class: "true"
+  creationTimestamp: "2020-01-23T17:21:39Z"
+  name: gp2
+  resourceVersion: "159"
+  selfLink: /apis/storage.k8s.io/v1/storageclasses/gp2
+  uid: d11284e6-3e04-11ea-914c-0639379dec16
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+```
+
+It is not so we need to make it so - this is a one off action that does not need to be repeated (although it is safe to do so)
+
+```
+$ kubectl patch sc gp2 -p '{"allowVolumeExpansion": true}'
+storageclass.storage.k8s.io/gp2 patched
+````
+
+```
+$ kubectl get sc gp2 -o yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"},"name":"gp2"},"parameters":{"fsType":"ext4","type":"gp2"},"provisioner":"kubernetes.io/aws-ebs","volumeBindingMode":"WaitForFirstConsumer"}
+    storageclass.kubernetes.io/is-default-class: "true"
+  creationTimestamp: "2020-01-23T17:21:39Z"
+  name: gp2
+  resourceVersion: "6275978"
+  selfLink: /apis/storage.k8s.io/v1/storageclasses/gp2
+  uid: d11284e6-3e04-11ea-914c-0639379dec16
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+```
+
+Now we can change the PVC, in this case by editing the PVCs.
+
+```
+$ kubectl edit -n concourse pvc concourse-work-dir-concourse-worker-0
+persistentvolumeclaim/concourse-work-dir-concourse-worker-0 edite
+```
+
+```
+$ kubectl describe -n concourse pvc concourse-work-dir-concourse-worker-1
+Name:          concourse-work-dir-concourse-worker-1
+Namespace:     concourse
+StorageClass:  gp2
+Status:        Bound
+Volume:        pvc-72cc8e85-3e25-11ea-914c-0639379dec16
+Labels:        app=concourse-worker
+               release=concourse
+Annotations:   pv.kubernetes.io/bind-completed: yes
+               pv.kubernetes.io/bound-by-controller: yes
+               volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
+               volume.kubernetes.io/selected-node: ip-10-20-103-15.eu-west-2.compute.internal
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:      20Gi
+Access Modes:  RWO
+VolumeMode:    Filesystem
+Mounted By:    concourse-worker-1
+Conditions:
+  Type                      Status  LastProbeTime                     LastTransitionTime                Reason  Message
+  ----                      ------  -----------------                 ------------------                ------  -------
+  FileSystemResizePending   True    Mon, 01 Jan 0001 00:00:00 +0000   Mon, 24 Feb 2020 10:27:07 +0100           Waiting for user to (re-)start a pod to finish file system resize of volume on node.
+Events:                     <none>
+```
+
+We need to restart the pod to bring it online with the new storage - as this is concourse we are working with we can 'land' the worker node.
+
+```
+$ fly -t nlc land-worker --worker concourse-worker-0
+landed 'concourse-worker-0'
+$ fly -t nlc land-worker --worker concourse-worker-1
+landed 'concourse-worker-1'
+$ fly -t nlc workers
+name                containers  platform  tags  team  state    version  age
+concourse-worker-0  24          linux     none  none  landing  2.2      5h22m
+concourse-worker-1  6           linux     none  none  landing  2.2      1h54m
+```
+
+Prior to deleting the pods.
+
+```
+$ kubectl delete -n concourse pod concourse-worker-0
+pod "concourse-worker-1" deleted
+$ kubectl delete -n concourse pod concourse-worker-1
+pod "concourse-worker-1" deleted
+```
+
+Once the pods come back online.
+
+```
+$ kubectl get po -n concourse
+NAME                             READY   STATUS    RESTARTS   AGE
+concourse-postgresql-0           1/1     Running   1          31d
+concourse-web-699fc698b5-nf6z9   1/1     Running   0          31d
+concourse-worker-0               1/1     Running   0          8m22s
+concourse-worker-1               1/1     Running   0          7m23s
+```
+
+The PV has resized and we have a 30gb disk now.
+
+```
+$ kubectl describe -n concourse pvc concourse-work-dir-concourse-worker-0
+Name:          concourse-work-dir-concourse-worker-0
+Namespace:     concourse
+StorageClass:  gp2
+Status:        Bound
+Volume:        pvc-72ca24b8-3e25-11ea-914c-0639379dec16
+Labels:        app=concourse-worker
+               release=concourse
+Annotations:   pv.kubernetes.io/bind-completed: yes
+               pv.kubernetes.io/bound-by-controller: yes
+               volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
+               volume.kubernetes.io/selected-node: ip-10-20-101-39.eu-west-2.compute.internal
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:      30Gi
+Access Modes:  RWO
+VolumeMode:    Filesystem
+Mounted By:    concourse-worker-0
+Events:        <none>
+
+$ kubectl exec -t -i -n concourse concourse-worker-1 df  /concourse-work-dir
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/nvme2n1    30832548 3299620  27516544  11% /concourse-work-dir
+```
