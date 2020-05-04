@@ -12,12 +12,14 @@ header_links:
   Documentation: /
 
 # Tracking ID from Google Analytics (e.g. UA-XXXX-Y)
-# ga_tracking_id: 
+# ga_tracking_id:
 
 # google_site_verification:
 
+
+max_toc_heading_level: 1
 # Multi-page options
 multipage_nav: true
 collapsible_nav: true
 
-max_toc_heading_level: 3
+enable_search: true
