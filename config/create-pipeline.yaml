@@ -1,0 +1,15 @@
+---
+
+  platform: linux
+
+  image_resource:
+    type: docker-image
+    source:
+      repository: nlcdigital/nlc-fly-cli
+      tag: latest
+  inputs:
+    - name: branches
+  outputs:
+    - name: output
+  run:
+    path: /usr/local/bin/create-pipeline.sh
