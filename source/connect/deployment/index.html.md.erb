@@ -4,3 +4,23 @@ weight: 10
 ---
 
 # Deployment
+
+There are two ways of deploying the codebase:
+
+1. If there are changes to the helm plan
+
+2. If there are no changes to the helm plan
+
+## With Helm
+
+Diff what's currently there:
+
+`helm diff upgrade prod -n connect nlc-connect -f values-prod.yaml`
+
+Deploy
+
+`helm upgrade prod -n connect nlc-connect -f values-prod.yaml`
+
+## Without Helm
+
+`kubectl -n connect-staging rollout restart deployment staging-nlc-connect`
