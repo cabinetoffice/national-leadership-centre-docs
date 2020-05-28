@@ -1,0 +1,91 @@
+## To remove a node cleanly from EKS ASG
+
+Firstly check what us running on the node you wish to remove
+
+```
+$ kubectl get pods --all-namespaces -o wide --field-selector spec.nodeName=ip-10-20-102-23.eu-west-2.compute.internal
+NAMESPACE     NAME                                             READY   STATUS    RESTARTS   AGE     IP              NODE                                         NOMINATED NODE   READINESS GATES
+elk           fluentd-xl49g                                    1/1     Running   0          16h     10.20.102.154   ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+elk           kibana-kibana-bcddc4989-9p8qf                    1/1     Running   0          16h     10.20.102.9     ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+elk           metricbeat-metricbeat-bhb8c                      1/1     Running   0          16h     10.20.102.114   ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+elk           metricbeat-metricbeat-metrics-5c8ff7744f-4ltz9   1/1     Running   0          16h     10.20.102.239   ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+kube-system   aws-node-59r87                                   1/1     Running   0          24d     10.20.102.23    ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+kube-system   kube-proxy-hgggf                                 1/1     Running   0          24d     10.20.102.23    ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+prometheus    prom-grafana-c89c9d888-8zjch                     2/2     Running   0          6d17h   10.20.102.32    ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+prometheus    prom-prometheus-node-exporter-9tqhc              1/1     Running   0          6d17h   10.20.102.23    ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+vault         vault-0                                          1/1     Running   0          6d16h   10.20.102.90    ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+vault         vault-agent-injector-74d4599db-tmxpd             1/1     Running   0          6d16h   10.20.102.103   ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+```
+
+for example we can see this pod - we will look later to check it moved
+
+```
+✔ ~/dev/convivio/nlc/deployment/elk [master ↑·1|✚ 18…321]
+08:52 $ k get pod -n elk -lapp=kibana  -o wide
+NAME                            READY   STATUS    RESTARTS   AGE     IP              NODE                                         NOMINATED NODE   READINESS GATES
+kibana-kibana-bcddc4989-9p8qf   1/1     Running   0          16h     10.20.102.9     ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+```
+
+Drain the node
+
+```
+08:52 $ kubectl drain  ip-10-20-102-23.eu-west-2.compute.internal --ignore-daemonsets
+node/ip-10-20-102-23.eu-west-2.compute.internal cordoned
+evicting pod "kibana-kibana-bcddc4989-9p8qf"
+evicting pod "vault-agent-injector-74d4599db-tmxpd"
+evicting pod "metricbeat-metricbeat-metrics-5c8ff7744f-4ltz9"
+evicting pod "vault-0"
+pod/vault-agent-injector-74d4599db-tmxpd evicted
+pod/vault-0 evicted
+pod/metricbeat-metricbeat-metrics-5c8ff7744f-4ltz9 evicted
+pod/kibana-kibana-bcddc4989-9p8qf evicted
+node/ip-10-20-102-23.eu-west-2.compute.internal evicted
+```
+
+Now we can check that the pods have been moved - at least the non daemon set nodes - we can see them being recreated elsewhere
+
+```
+$ k get pod -n elk -lapp=kibana -o wide
+NAME                            READY   STATUS              RESTARTS   AGE     IP              NODE                                         NOMINATED NODE   READINESS GATES
+kibana-kibana-bcddc4989-g8rk7   0/1     ContainerCreating   0          14s     10.20.102.71    ip-10-20-102-82.eu-west-2.compute.internal   <none>           <none>
+```
+
+all we are left with is daemonsets
+
+```
+$ kubectl get pods --all-namespaces -o wide --field-selector spec.nodeName=ip-10-20-102-23.eu-west-2.compute.internal
+NAMESPACE     NAME                                  READY   STATUS    RESTARTS   AGE     IP              NODE                                         NOMINATED NODE   READINESS GATES
+elk           fluentd-xl49g                         1/1     Running   0          16h     10.20.102.154   ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+elk           metricbeat-metricbeat-bhb8c           1/1     Running   0          16h     10.20.102.114   ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+kube-system   aws-node-59r87                        1/1     Running   0          24d     10.20.102.23    ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+kube-system   kube-proxy-hgggf                      1/1     Running   0          24d     10.20.102.23    ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+prometheus    prom-prometheus-node-exporter-9tqhc   1/1     Running   0          6d17h   10.20.102.23    ip-10-20-102-23.eu-west-2.compute.internal   <none>           <none>
+```
+
+Get the instance ID we will be removing
+
+
+```
+$ aws ec2 describe-instances --filter Name=private-ip-address,Values=10.20.102.23 | jq -r '.Reservations[].Instances[] | .InstanceId, .PrivateIpAddress'
+i-06ed86a3e0c14d25d
+10.20.102.23
+
+```
+
+and remove from the ASG
+
+```
+$ aws autoscaling terminate-instance-in-auto-scaling-group --instance-id i-06ed86a3e0c14d25d --should-decrement-desired-capacity
+{
+    "Activity": {
+        "ActivityId": "8e95c19b-5628-07a8-28fb-56a11ebc00c7",
+        "AutoScalingGroupName": "nlc-prod-02020012317254124570000000e",
+        "Description": "Terminating EC2 instance: i-06ed86a3e0c14d25d",
+        "Cause": "At 2020-02-21T08:20:35Z instance i-06ed86a3e0c14d25d was taken out of service in response to a user request, shrinking the capacity from 6 to 5.",
+        "StartTime": "2020-02-21T08:20:35.457000+00:00",
+        "StatusCode": "InProgress",
+        "Progress": 0,
+        "Details": "{\"Subnet ID\":\"subnet-096a9340d6734d9f3\",\"Availability Zone\":\"eu-west-2b\"}"
+    }
+}
+```
