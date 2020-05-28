@@ -1,0 +1,19 @@
+---
+title: Drush
+---
+
+# Drush
+
+Drush is a command line tool for interacting with Drupal.
+
+You need to be able to ssh into a pod to interact with it:
+
+`kubectl -n connect exec -it prod-nlc-connect-XXXX --container nlc-drupal /bin/bash`
+
+What this command does is execute the bash shell in the `nlc-drupal` container inside a running pod.
+
+You should then have access to a shell where you can run:
+
+`/usr/bin/vaultenv-wrapper vendor/bin/drush`
+
+The `vaultenv-wrapper` ensures that drush has the correct credentials for connecting to the database.
