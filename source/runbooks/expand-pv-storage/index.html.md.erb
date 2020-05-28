@@ -170,3 +170,22 @@ $ kubectl exec -t -i -n concourse concourse-worker-1 df  /concourse-work-dir
 Filesystem     1K-blocks    Used Available Use% Mounted on
 /dev/nvme2n1    30832548 3299620  27516544  11% /concourse-work-dir
 ```
+
+
+Note - if this is for a concourse node running btrfs you will also need to resize the btrfs filesystem - even though the underlying PV has been expanded btrfs will need to be told to use that extra space.
+
+For a host filesystem mounted as /concourse-work-dir/volumes
+
+```
+root@concourse-worker-1:/# btrfs filesystem resize '+1g' /concourse-work-dir/volumes
+```
+
+or
+
+```
+root@concourse-worker-1:/# btrfs filesystem resize max /concourse-work-dir/volumes
+```
+
+
+
+
