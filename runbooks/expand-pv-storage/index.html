@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en" class="govuk-template no-js">
+  <head>
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+    <title>Expand Persistent Volume Storage | NLC Technical Documentation</title>
+
+    <link href="/stylesheets/manifest.css" rel="stylesheet" />
+
+    <link rel="canonical" href="docs.nationalleadership.gov.uk/runbooks/expand-pv-storage/">
+
+
+      <meta property="og:image" content="docs.nationalleadership.gov.uk/images/govuk-large.png" />
+      <meta property="og:site_name" content="NLC Technical Documentation" />
+      <meta property="og:title" content="Expand Persistent Volume Storage" />
+      <meta property="og:type" content="object" />
+      <meta property="og:url" content="docs.nationalleadership.gov.uk/runbooks/expand-pv-storage/" />
+      <meta property="twitter:card" content="summary" />
+      <meta property="twitter:image" content="docs.nationalleadership.gov.uk/images/govuk-large.png" />
+      <meta property="twitter:title" content="Expand Persistent Volume Storage | NLC Technical Documentation" />
+      <meta property="twitter:url" content="docs.nationalleadership.gov.uk/runbooks/expand-pv-storage/" />
+
+    
+  </head>
+
+  <body class="govuk-template__body">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+    <div class="app-pane">
+      <div class="app-pane__header toc-open-disabled">
+        <a href="#content" class="govuk-skip-link">Skip to main content</a>
+
+        <header class="govuk-header app-header" role="banner" data-module="govuk-header">
+  <div class="govuk-header__container govuk-header__container--full-width">
+    <div class="govuk-header__logo">
+      <a href="https://docs.nationalleadership.gov.uk/" class="govuk-header__link govuk-header__link--homepage">
+        <span class="govuk-header__product-name">
+          NLC Technical Documentation
+        </span>
+      </a>
+        <strong class="govuk-tag">Beta</strong>
+    </div>
+    <div class="govuk-header__content">
+      <button type="button" role="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide Top Level Navigation">Menu</button>
+      <nav>
+        <ul id="navigation" class="govuk-header__navigation govuk-header__navigation--end" aria-label="Top Level Navigation">
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link" href="/">Documentation</a>
+            </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+      </div>
+
+        <div id="toc-heading" class="toc-show fixedsticky">
+          <a href="#toc" class="toc-show__label js-toc-show" aria-controls="toc">
+            Table of contents <span class="toc-show__icon"></span>
+          </a>
+        </div>
+
+      <div class="app-pane__body" data-module="in-page-navigation">
+          <div class="app-pane__toc">
+            <div class="toc" data-module="table-of-contents">
+              <div class="search" data-module="search">
+  <form action="https://www.google.co.uk/search" method="get" role="search">
+    <input type="hidden" name="as_sitesearch" value="docs.nationalleadership.gov.uk"/>
+    <label class="govuk-label search__label" for="search">
+      Search (via Google)
+    </label>
+    <input class="govuk-input govuk-!-margin-bottom-4" id="search" name="q" type="text" aria-controls="search-results" placeholder="Search">
+  </form>
+  <div id="search-results" class="search-results" aria-hidden="true" role="dialog" aria-labelledby="search-results-title">
+    <div class="search-results__inner">
+      <button class="search-results__close">Close<span class="search-results__close-label"> search results</span></button>
+      <h2 id="search-results-title" class="search-results__title" aria-live="polite">Results</h2>
+      <div class="search-results__content"></div>
+    </div>
+  </div>
+</div>
+
+              <a href="#" class="toc__close js-toc-close" aria-controls="toc" aria-label="Hide table of contents"></a>
+              <nav id="toc" class="js-toc-list toc__list" aria-labelledby="toc-heading" data-module="collapsible-navigation">
+                      <ul>
+  <li>
+    <a href="/#nlc-technical-documentation"><span>NLC Technical Documentation</span></a>
+  </li>
+</ul>
+<ul><li><a href="/connect/"><span>Connect</span></a>
+<ul>
+  <li>
+    <a href="/connect/deployment/#deployment"><span>Deployment</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/connect/build/#build"><span>Build</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/connect/drush/#drush"><span>Drush</span></a>
+  </li>
+</ul>
+</li></ul><ul><li><a href="/infrastructure/"><span>Infrastructure</span></a>
+<ul>
+  <li>
+    <a href="/infrastructure/concourse/#concourse"><span>Concourse</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/infrastructure/docker/#docker"><span>Docker</span></a>
+  </li>
+</ul>
+<ul><li><a href="/infrastructure/eks/"><span>EKS</span></a>
+<ul>
+  <li>
+    <a href="/infrastructure/eks/rbac/#rbac"><span>RBAC</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/infrastructure/eks/namespaces/#namespaces"><span>Namespaces</span></a>
+  </li>
+</ul>
+</li></ul><ul>
+  <li>
+    <a href="/infrastructure/elastic-search/#elastic-search"><span>Elastic Search</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/infrastructure/helm/#helm"><span>Helm</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/infrastructure/prometheus/#prometheus"><span>Prometheus</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/infrastructure/rds/#rds"><span>RDS</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/infrastructure/s3/#s3"><span>S3</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/infrastructure/terraform-and-terragrunt/#terraform-and-terragrunt"><span>Terraform and Terragrunt</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/infrastructure/vault/#vault"><span>Vault</span></a>
+  </li>
+</ul>
+</li></ul><ul><li><a href="/runbooks/"><span>Runbooks</span></a>
+<ul>
+  <li>
+    <a href="/runbooks/expand-pv-storage/#expand-persistent-volume-storage"><span>Expand Persistent Volume Storage</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/runbooks/new-service-on-subdomain/#new-service-on-subdomain"><span>New Service on Subdomain</span></a>
+  </li>
+</ul>
+<ul>
+  <li>
+    <a href="/runbooks/remove-node-from-asg/#to-remove-a-node-cleanly-from-eks-asg"><span>To remove a node cleanly from EKS ASG</span></a>
+  </li>
+</ul>
+</li></ul>
+
+              </nav>
+            </div>
+          </div>
+
+        <div class="app-pane__content toc-open-disabled">
+          <main id="content" class="technical-documentation" data-module="anchored-headings">
+            <h1 id="expand-persistent-volume-storage">Expand Persistent Volume Storage</h1><p>When a persistent volume claim has been created on EKS and it turns out to need more storage.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>$ kubectl exec -t -i -n concourse concourse-worker-0  df /concourse-work-dir
+Filesystem     1K-blocks     Used Available Use% Mounted on
+/dev/nvme1n1    20511312 18434580   2060348  90% /concourse-work-dir
+
+$ kubectl exec -t -i -n concourse concourse-worker-1  df /concourse-work-dir
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/nvme2n1    20511312 2983724  17511204  15% /concourse-work-dir
+
+$ kubectl get -n concourse pvc concourse-work-dir-concourse-worker-0
+NAME                                    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+concourse-work-dir-concourse-worker-0   Bound    pvc-72ca24b8-3e25-11ea-914c-0639379dec16   20Gi       RWO            gp2            31d
+
+$ kubectl get -n concourse pvc concourse-work-dir-concourse-worker-1
+NAME                                    STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+concourse-work-dir-concourse-worker-1   Bound    pvc-72cc8e85-3e25-11ea-914c-0639379dec16   20Gi       RWO            gp2            31d
+</code></pre></div><p>Ensure that the gp2 storage class is expandable.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>$ kubectl get sc gp2 -o yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"},"name":"gp2"},"parameters":{"fsType":"ext4","type":"gp2"},"provisioner":"kubernetes.io/aws-ebs","volumeBindingMode":"WaitForFirstConsumer"}
+    storageclass.kubernetes.io/is-default-class: "true"
+  creationTimestamp: "2020-01-23T17:21:39Z"
+  name: gp2
+  resourceVersion: "159"
+  selfLink: /apis/storage.k8s.io/v1/storageclasses/gp2
+  uid: d11284e6-3e04-11ea-914c-0639379dec16
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+</code></pre></div><p>It is not so we need to make it so - this is a one off action that does not need to be repeated (although it is safe to do so)</p>
+<div class="highlight"><pre class="highlight plaintext"><code>$ kubectl patch sc gp2 -p '{"allowVolumeExpansion": true}'
+storageclass.storage.k8s.io/gp2 patched
+</code></pre></div><div class="highlight"><pre class="highlight plaintext"><code>$ kubectl get sc gp2 -o yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"storage.k8s.io/v1","kind":"StorageClass","metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"},"name":"gp2"},"parameters":{"fsType":"ext4","type":"gp2"},"provisioner":"kubernetes.io/aws-ebs","volumeBindingMode":"WaitForFirstConsumer"}
+    storageclass.kubernetes.io/is-default-class: "true"
+  creationTimestamp: "2020-01-23T17:21:39Z"
+  name: gp2
+  resourceVersion: "6275978"
+  selfLink: /apis/storage.k8s.io/v1/storageclasses/gp2
+  uid: d11284e6-3e04-11ea-914c-0639379dec16
+parameters:
+  fsType: ext4
+  type: gp2
+provisioner: kubernetes.io/aws-ebs
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+</code></pre></div><p>Now we can change the PVC, in this case by editing the PVCs.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>$ kubectl edit -n concourse pvc concourse-work-dir-concourse-worker-0
+persistentvolumeclaim/concourse-work-dir-concourse-worker-0 edite
+</code></pre></div><div class="highlight"><pre class="highlight plaintext"><code>$ kubectl describe -n concourse pvc concourse-work-dir-concourse-worker-1
+Name:          concourse-work-dir-concourse-worker-1
+Namespace:     concourse
+StorageClass:  gp2
+Status:        Bound
+Volume:        pvc-72cc8e85-3e25-11ea-914c-0639379dec16
+Labels:        app=concourse-worker
+               release=concourse
+Annotations:   pv.kubernetes.io/bind-completed: yes
+               pv.kubernetes.io/bound-by-controller: yes
+               volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
+               volume.kubernetes.io/selected-node: ip-10-20-103-15.eu-west-2.compute.internal
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:      20Gi
+Access Modes:  RWO
+VolumeMode:    Filesystem
+Mounted By:    concourse-worker-1
+Conditions:
+  Type                      Status  LastProbeTime                     LastTransitionTime                Reason  Message
+  ----                      ------  -----------------                 ------------------                ------  -------
+  FileSystemResizePending   True    Mon, 01 Jan 0001 00:00:00 +0000   Mon, 24 Feb 2020 10:27:07 +0100           Waiting for user to (re-)start a pod to finish file system resize of volume on node.
+Events:                     &lt;none&gt;
+</code></pre></div><p>We need to restart the pod to bring it online with the new storage - as this is concourse we are working with we can &lsquo;land&rsquo; the worker node.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>$ fly -t nlc land-worker --worker concourse-worker-0
+landed 'concourse-worker-0'
+$ fly -t nlc land-worker --worker concourse-worker-1
+landed 'concourse-worker-1'
+$ fly -t nlc workers
+name                containers  platform  tags  team  state    version  age
+concourse-worker-0  24          linux     none  none  landing  2.2      5h22m
+concourse-worker-1  6           linux     none  none  landing  2.2      1h54m
+</code></pre></div><p>Prior to deleting the pods.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>$ kubectl delete -n concourse pod concourse-worker-0
+pod "concourse-worker-1" deleted
+$ kubectl delete -n concourse pod concourse-worker-1
+pod "concourse-worker-1" deleted
+</code></pre></div><p>Once the pods come back online.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>$ kubectl get po -n concourse
+NAME                             READY   STATUS    RESTARTS   AGE
+concourse-postgresql-0           1/1     Running   1          31d
+concourse-web-699fc698b5-nf6z9   1/1     Running   0          31d
+concourse-worker-0               1/1     Running   0          8m22s
+concourse-worker-1               1/1     Running   0          7m23s
+</code></pre></div><p>The PV has resized and we have a 30gb disk now.</p>
+<div class="highlight"><pre class="highlight plaintext"><code>$ kubectl describe -n concourse pvc concourse-work-dir-concourse-worker-0
+Name:          concourse-work-dir-concourse-worker-0
+Namespace:     concourse
+StorageClass:  gp2
+Status:        Bound
+Volume:        pvc-72ca24b8-3e25-11ea-914c-0639379dec16
+Labels:        app=concourse-worker
+               release=concourse
+Annotations:   pv.kubernetes.io/bind-completed: yes
+               pv.kubernetes.io/bound-by-controller: yes
+               volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
+               volume.kubernetes.io/selected-node: ip-10-20-101-39.eu-west-2.compute.internal
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:      30Gi
+Access Modes:  RWO
+VolumeMode:    Filesystem
+Mounted By:    concourse-worker-0
+Events:        &lt;none&gt;
+
+$ kubectl exec -t -i -n concourse concourse-worker-1 df  /concourse-work-dir
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/nvme2n1    30832548 3299620  27516544  11% /concourse-work-dir
+</code></pre></div><p>Note - if this is for a concourse node running btrfs you will also need to resize the btrfs filesystem - even though the underlying PV has been expanded btrfs will need to be told to use that extra space.</p>
+<p>For a host filesystem mounted as /concourse-work-dir/volumes</p>
+<div class="highlight"><pre class="highlight plaintext"><code>root@concourse-worker-1:/# btrfs filesystem resize '+1g' /concourse-work-dir/volumes
+</code></pre></div><p>or</p>
+<div class="highlight"><pre class="highlight plaintext"><code>root@concourse-worker-1:/# btrfs filesystem resize max /concourse-work-dir/volumes
+</code></pre></div>
+            
+          </main>
+
+          <aside>
+          </aside>
+
+          <footer class="govuk-footer app-footer" role="contentinfo">
+  <div class="govuk-footer__meta">
+    <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+
+
+      <svg
+        role="presentation"
+        focusable="false"
+        class="govuk-footer__licence-logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewbox="0 0 483.2 195.7"
+        height="17"
+        width="41"
+      >
+        <path
+          fill="currentColor"
+          d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"
+        />
+      </svg>
+      <span class="govuk-footer__licence-description">
+        All content is available under the
+        <a
+          class="govuk-footer__link"
+          href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+          rel="license"
+        >Open Government Licence v3.0</a>, except where otherwise stated
+      </span>
+    </div>
+    <div class="govuk-footer__meta-item">
+      <a
+        class="govuk-footer__link govuk-footer__copyright-logo"
+        href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/"
+      >© Crown copyright</a>
+    </div>
+  </div>
+</footer>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <script src="/javascripts/application.js"></script>
+  </body>
+</html>
